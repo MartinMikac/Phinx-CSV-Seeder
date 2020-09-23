@@ -111,6 +111,11 @@ abstract class CsvSeeder extends AbstractSeed
             $temp = [];
             foreach ($mapping as $key => $value) {
                 $temp[$value] = $csvRows[$i][$key];
+                // replace empty csv columns with null
+                if (empty($csvRows[$i][$key])) {
+                    $csvRows[$i][$key] = null;
+                }
+
             }
             $toBuild[] = $temp;
         }
