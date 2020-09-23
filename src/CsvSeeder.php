@@ -29,7 +29,8 @@ abstract class CsvSeeder extends AbstractSeed
     {
         $this->fileName = $filename;
         $toInsert = $this->seedFromCSV();
-        $this->insert($table, $toInsert);
+        $this->table($table)->insert($toInsert)->save();
+        // $this->insert($table, $toInsert);
     }
 
     private function seedFromCSV()
