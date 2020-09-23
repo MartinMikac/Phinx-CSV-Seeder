@@ -1,17 +1,15 @@
 # Phinx Csv Seeder
 
-[![Build Status](https://travis-ci.org/BackEndTea/Phinx-CSV-Seeder.svg?branch=master)](https://travis-ci.org/BackEndTea/Phinx-CSV-Seeder)
-
 ## Instalation
 
 ```bash
-$ composer require backendtea/phinx-csv-seeder
+$ composer require martin-mikac/phinx-csv-seeder
 ```
 
 ## Requirements
 
 * PHP 5.6 or higher
-* robmorgan/phinx version 0.8.1 or higher
+* robmorgan/phinx version 0.12.4 or higher
 
 ## Usage
 
