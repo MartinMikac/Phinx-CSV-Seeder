@@ -1,5 +1,5 @@
 {
-  "name": "martinMikac/phinx-csv-seeder",
+  "name": "martin-mikac/phinx-csv-seeder",
   "description": "A simple way to seed your database from a csv file using phinx",
   "type": "library",
   "license": "MIT",
