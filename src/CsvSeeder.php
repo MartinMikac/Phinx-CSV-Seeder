@@ -116,17 +116,11 @@ abstract class CsvSeeder extends AbstractSeed
                 if (empty($csvRows[$i][$key])) {
                     $csvRows[$i][$key] = null;
                 }
-
+                $temp[$value] = $csvRows[$i][$key];
             }
             $toBuild[] = $temp;
         }
 
         return $toBuild;
     }
-
-
-
-
-
-
 }
