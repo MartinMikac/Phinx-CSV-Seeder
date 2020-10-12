@@ -96,6 +96,7 @@ abstract class CsvMigration extends AbstractMigration
         return $gzipped;
     }
 
+
     /**
      * Build up array to insert into database
      *
@@ -115,6 +116,7 @@ abstract class CsvMigration extends AbstractMigration
                 if (empty($csvRows[$i][$key])) {
                     $csvRows[$i][$key] = null;
                 }
+                $temp[$value] = $csvRows[$i][$key];
 
             }
             $toBuild[] = $temp;
@@ -122,7 +124,6 @@ abstract class CsvMigration extends AbstractMigration
 
         return $toBuild;
     }
-
 
 
 
