@@ -97,6 +97,7 @@ abstract class CsvMigration extends AbstractMigration
     }
 
 
+
     /**
      * Build up array to insert into database
      *
@@ -108,12 +109,13 @@ abstract class CsvMigration extends AbstractMigration
     {
         $toBuild = [];
         $offset =  1 ;
+
         for ($i = $offset; $i < count($csvRows); $i++) {
             $temp = [];
             foreach ($mapping as $key => $value) {
                 $temp[$value] = $csvRows[$i][$key];
                 // replace empty csv columns with null
-                if (empty($csvRows[$i][$key])) {
+                if ( strlen($csvRows[$i][$key]) == 0 ) {
                     $csvRows[$i][$key] = null;
                 }
                 $temp[$value] = $csvRows[$i][$key];
@@ -124,6 +126,7 @@ abstract class CsvMigration extends AbstractMigration
 
         return $toBuild;
     }
+
 
 
 
