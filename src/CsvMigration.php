@@ -135,14 +135,74 @@ abstract class CsvMigration extends AbstractMigration
     /**
      * @param $tableName
      */
-    public function insertCsvFromFile($tableName)
+    public function insertCsvFromFile($tableName, $isRealData = true)
     {
-        $fileDir = __DIR__ . '/../files/';
-        $fileName = $tableName . '.csv';
+        // $fileDir = __DIR__ . '/../files/';
+        $fileDir = __DIR__ . '/../../../../phinx/db/files/';
+
+        if ($isRealData == true) {
+            $fileName = $tableName . '.csv';
+        } else {
+            $fileName = $tableName . '_fake.csv';
+        }
+
         $fileNameFull = $fileDir . $fileName;
         if (file_exists($fileNameFull)) {
             $this->insertCsv($tableName, $fileNameFull);
         }
+    }
+
+    /**
+     * @param $tableName
+     * @param $checkRealData
+     * @return bool
+     */
+    private function checkCsvFile($tableName, $checkRealData = true)
+    {
+
+        $fileDir = __DIR__ . '/../../../../phinx/db/files/';
+
+        if ($checkRealData == true) {
+            $fileName = $tableName . '.csv';
+        } else {
+            $fileName = $tableName . '_fake.csv';
+        }
+        $fileNameFull = $fileDir . $fileName;
+
+        if (file_exists($fileNameFull)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param $tableName
+     * @return bool
+     */
+    public function checkAndImportCSVData($tableName, $importRealAndFake = false)
+    {
+        $isRealCsvData = $this->checkCsvFile($tableName, true);
+        $isFakeCsvData = $this->checkCsvFile($tableName, false);
+
+        if ($importRealAndFake == true) {
+            $this->insertCsvFromFile($tableName,true);
+            $this->insertCsvFromFile($tableName,false);
+
+            return true;
+        }
+
+        if ($isRealCsvData == true) {
+            $this->insertCsvFromFile($tableName,true);
+            return true;
+        }
+
+        if ($isFakeCsvData == true) {
+            $this->insertCsvFromFile($tableName,false);
+            return true;
+        }
+
+        return false;
     }
 
 
