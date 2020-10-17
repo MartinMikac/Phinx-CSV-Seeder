@@ -294,6 +294,8 @@ abstract class CsvMigration extends AbstractMigration
 
     public function down()
     {
+        $this->configureMigration();
+
         $this->truncateCascade($this->getTableName());
     }
 
