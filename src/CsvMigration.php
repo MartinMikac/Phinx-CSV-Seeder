@@ -231,8 +231,6 @@ abstract class CsvMigration extends AbstractMigration
 
         $skipFakeData = $this->getSkipFakeDataFlag();
 
-        var_dump($skipFakeData);
-
         if ($skipFakeData != true) {
             $dataImported = $this->performImportFakeData($tableName) || $dataImported;
         }
