@@ -25,6 +25,50 @@ abstract class CsvMigration extends AbstractMigration
      */
     private $fileName;
 
+    public $SKIP_VAR_NAME = 'SKIP_FAKE';
+
+    private $fileBasePath = __DIR__ . '/../../../..';
+
+    /**
+     * @return mixed
+     */
+    public function getFileBasePath()
+    {
+        return $this->fileBasePath;
+    }
+
+    /**
+     * @param mixed $fileBasePath
+     */
+    public function setFileBasePath($fileBasePath): void
+    {
+        $this->fileBasePath = $fileBasePath;
+    }
+
+    private $table_name;
+
+    /**
+     * @return mixed
+     */
+    public function getTableName()
+    {
+        return $this->table_name;
+    }
+
+    /**
+     * @param mixed $table_name
+     */
+    public function setTableName($table_name): void
+    {
+        $this->table_name = $table_name;
+    }
+
+    protected function configureMigration()
+    {
+
+        // to be override
+    }
+
     public function insertCsv($table, $filename)
     {
         $this->fileName = $filename;
@@ -138,7 +182,7 @@ abstract class CsvMigration extends AbstractMigration
     public function insertCsvFromFile($tableName, $isRealData = true)
     {
         // $fileDir = __DIR__ . '/../files/';
-        $fileDir = __DIR__ . '/../../../../phinx/db/files/';
+        $fileDir =  $this->fileBasePath.'/phinx/db/files/';
 
         if ($isRealData == true) {
             $fileName = $tableName . '.csv';
@@ -160,7 +204,8 @@ abstract class CsvMigration extends AbstractMigration
     private function checkCsvFile($tableName, $checkRealData = true)
     {
 
-        $fileDir = __DIR__ . '/../../../../phinx/db/files/';
+        //$fileDir = __DIR__ . '/../../../../phinx/db/files/';
+        $fileDir =  $this->fileBasePath.'/phinx/db/files/';
 
         if ($checkRealData == true) {
             $fileName = $tableName . '.csv';
@@ -169,11 +214,9 @@ abstract class CsvMigration extends AbstractMigration
         }
         $fileNameFull = $fileDir . $fileName;
 
-        if (file_exists($fileNameFull)) {
-            return true;
-        } else {
-            return false;
-        }
+        $fileExist =file_exists($fileNameFull);
+        return $fileExist;
+
     }
 
     /**
@@ -182,27 +225,81 @@ abstract class CsvMigration extends AbstractMigration
      */
     public function checkAndImportCSVData($tableName, $importRealAndFake = false)
     {
+        $dataImported = false;
+
+        $dataImported = $this->performImportRealData($tableName);
+
+        $skipFakeData = $this->getSkipFakeDataFlag();
+
+        var_dump($skipFakeData);
+
+        if ($skipFakeData != true) {
+            $dataImported = $this->performImportFakeData($tableName) || $dataImported;
+        }
+
+        return $dataImported;
+    }
+
+    protected function getSkipFakeDataFlag()
+    {
+        $skipFlag = false;
+        $skipFlagEnvValue = getenv($this->SKIP_VAR_NAME);
+
+        if (isset($skipFlagEnvValue)) {
+            $skipFlag = ($skipFlagEnvValue == '1') || ($skipFlagEnvValue == 'true') || ($skipFlagEnvValue == 'on');
+        }
+
+        return $skipFlag;
+    }
+
+    protected function performImportRealData($tableName)
+    {
         $isRealCsvData = $this->checkCsvFile($tableName, true);
+        if ($isRealCsvData == true) {
+            $this->insertCsvFromFile($tableName, true);
+        } else {
+            $this->doManualImportReal($tableName);
+        }
+        return false;
+
+    }
+
+    protected function doManualImportReal($tableName)
+    {
+
+    }
+
+    protected function doManualImportFake($tableName)
+    {
+
+    }
+
+    protected function performImportFakeData($tableName)
+    {
         $isFakeCsvData = $this->checkCsvFile($tableName, false);
 
-        if ($importRealAndFake == true) {
-            $this->insertCsvFromFile($tableName,true);
-            $this->insertCsvFromFile($tableName,false);
-
-            return true;
-        }
-
-        if ($isRealCsvData == true) {
-            $this->insertCsvFromFile($tableName,true);
-            return true;
-        }
-
         if ($isFakeCsvData == true) {
-            $this->insertCsvFromFile($tableName,false);
-            return true;
+            $this->insertCsvFromFile($tableName, false);
+        } else {
+            $this->doManualImportFake($tableName);
         }
 
         return false;
+    }
+
+    public function up()
+    {
+        $this->configureMigration();
+
+        $isImportedData = $this->checkAndImportCSVData($this->getTableName(), false);
+
+        $this->doManualImportReal($this->getTableName());
+        $this->doManualImportFake($this->getTableName());
+    }
+
+    public function down()
+    {
+        $this->truncateCascade($this->getTableName());
     }
 
 
