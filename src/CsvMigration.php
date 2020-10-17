@@ -290,9 +290,6 @@ abstract class CsvMigration extends AbstractMigration
         $this->configureMigration();
 
         $isImportedData = $this->checkAndImportCSVData($this->getTableName(), false);
-
-        $this->doManualImportReal($this->getTableName());
-        $this->doManualImportFake($this->getTableName());
     }
 
     public function down()
