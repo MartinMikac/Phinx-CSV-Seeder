@@ -289,7 +289,13 @@ abstract class CsvMigration extends AbstractMigration
     {
         $this->configureMigration();
 
-        $isImportedData = $this->checkAndImportCSVData($this->getTableName(), false);
+        $this->checkAndImportCSVData($this->getTableName(), false);
+
+        $lastId = $this->fetchRow('select max("id") as max_count from "'.$this->getTableName().'"' );
+        $newIdSeq = ($lastId['max_count'] + 1);
+
+        // nastevení sekvence, aby začínala max záznamů + 1
+        $this->execute('ALTER SEQUENCE '.$this->getTableName().'_id_seq RESTART WITH '.$newIdSeq.';');
     }
 
     public function down()
@@ -298,6 +304,4 @@ abstract class CsvMigration extends AbstractMigration
 
         $this->truncateCascade($this->getTableName());
     }
-
-
 }
